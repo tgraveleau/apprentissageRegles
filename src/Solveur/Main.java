@@ -1,4 +1,6 @@
 package Solveur;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main {
 
@@ -6,7 +8,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		ParseurArff ra = new ParseurArff();
+		ArrayList<String[]> vals = ra.parse("./docs/weather.nominal.arff");
+		for (String[] arr : vals) {
+           System.out.println("Valeur : " + Arrays.toString(arr));
+        }
 
 	}
 

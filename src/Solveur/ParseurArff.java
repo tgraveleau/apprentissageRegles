@@ -27,7 +27,7 @@ public class ParseurArff {
 	/**Affiche le contenu du fichier. Cette fonction va disparaître prochainement, mais ça fait une base.
 	*/
 	ArffReader arff;
-	String[] vals = new String[5];
+	
 	try {
 		BufferedReader reader =	new BufferedReader(new FileReader(filename));
 		arff = new ArffReader(reader);
@@ -35,6 +35,7 @@ public class ParseurArff {
 		data.setClassIndex(data.numAttributes()-1);
 		
 		for (int i = 0; i <= data.numInstances()- 1; i++) {
+		    String[] vals = new String[5];
 		    Instance instance = data.get(i);
 		    vals[0]=instance.stringValue(0);
 		    vals[1]=instance.stringValue(1);
@@ -57,11 +58,6 @@ public class ParseurArff {
 		
 		return list;
 	}
-	/**Fonction présente pour le test*/
-	public static void main(String[] args) {
-		ParseurArff ra = new ParseurArff();
-		ArrayList<String[]> vals = ra.parse("./docs/weather.nominal.arff");
-		System.out.println(vals);
-	}
+	
 
 }
