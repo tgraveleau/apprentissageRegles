@@ -1,6 +1,8 @@
 package Solveur;
 
 import java.util.ArrayList;
+
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader.ArffReader;
 import java.io.BufferedReader;
@@ -10,10 +12,18 @@ import java.io.IOException;
 
 public class ParseurArff {
 	
+	public static ParseurArff instance;
+	
+	public static ParseurArff getInstance() {
+		if ( ParseurArff.instance == null ) {
+			ParseurArff.instance = new ParseurArff();
+		}
+		return ParseurArff.instance;
+	}
+	
 	public ArrayList<String[]> parse( String filename ) {
 		ArrayList<String[]> list = new ArrayList<String[]>();
 		
-		//@TODO
 		/**
 		 * Chaque donnée du fichier va être ajouté à la liste de cette façon:
 		 * 

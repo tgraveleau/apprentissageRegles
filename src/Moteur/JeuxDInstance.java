@@ -29,7 +29,7 @@ public class JeuxDInstance extends ArrayList<Instance> {
 	}
 	
 	public void addValueFromList( ArrayList<String[]> list ) {
-		
+		//@TODO
 	}
 	
 }

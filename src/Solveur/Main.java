@@ -2,6 +2,8 @@ package Solveur;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import UI.MainPanel;
+
 public class Main {
 
 	/**
@@ -13,6 +15,8 @@ public class Main {
 		for (String[] arr : vals) {
            System.out.println("Valeur : " + Arrays.toString(arr));
         }
+
+		MainPanel window = new MainPanel();
 
 	}
 
