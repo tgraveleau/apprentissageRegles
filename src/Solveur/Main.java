@@ -1,8 +1,7 @@
 package Solveur;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import UI.MainPanel;
+import Moteur.JeuxDInstanceSimple;
 
 public class Main {
 
@@ -11,12 +10,11 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		ParseurArff ra = new ParseurArff();
-		ArrayList<String[]> vals = ra.parse("./docs/weather.nominal.arff");
-		for (String[] arr : vals) {
-           System.out.println("Valeur : " + Arrays.toString(arr));
-        }
-
-		MainPanel window = new MainPanel();
+		JeuxDInstanceSimple vals = new JeuxDInstanceSimple("yes", "no");
+		vals.setValues( ra.parse("./docs/weather.nominal.arff") );
+		
+		vals.treatData();
+		
 
 	}
 
