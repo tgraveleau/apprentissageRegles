@@ -2,6 +2,7 @@ package Solveur;
 
 import java.util.ArrayList;
 
+import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader.ArffReader;
@@ -21,21 +22,35 @@ public class ParseurArff {
 		return ParseurArff.instance;
 	}
 	
-	public ArrayList<String[]> parse( String filename ) {
+	public Instances parse( String filename ) {
+		BufferedReader reader;
+		ArffReader arff;
+		Instances data = null;
+		try {
+			reader = new BufferedReader(new FileReader( filename ));
+			arff = new ArffReader(reader, 1000);
+			data = arff.getStructure();
+			data.setClassIndex(data.numAttributes() - 1);
+			Instance inst;
+
+			while ((inst = arff.readInstance(data)) != null) {
+				System.out.println(inst);
+				data.add(inst);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return data;
+		/*
 		ArrayList<String[]> list = new ArrayList<String[]>();
-		
-		/**
-		 * Chaque donnée du fichier va être ajouté à la liste de cette façon:
-		 * 
-		 * list.add( [ field, vlaue ]);
-		 * 
-		 * car on attend un tableau de string qui correspond au couple (field, value)
-		 */
+			
 
-	
-
-	/**Affiche le contenu du fichier. Cette fonction va disparaître prochainement, mais ça fait une base.
-	*/
+	// Affiche le contenu du fichier. Cette fonction va disparaître prochainement, mais ça fait une base.
 	ArffReader arff;
 	
 	try {
@@ -67,7 +82,8 @@ public class ParseurArff {
 
 		
 		return list;
+		*/
 	}
-	
+
 
 }

@@ -2,6 +2,8 @@ package Moteur;
 
 import java.util.ArrayList;
 
+import weka.core.Instances;
+
 public class JeuxDInstance extends ArrayList<Instance> {
 
 	private static final long serialVersionUID = 1L;
@@ -28,7 +30,7 @@ public class JeuxDInstance extends ArrayList<Instance> {
 		return falseValue;
 	}
 	
-	public void addValueFromList( ArrayList<String[]> list ) {
+	public void addValueFromList( Instances instances ) {
 		//@TODO
 	}
 	
