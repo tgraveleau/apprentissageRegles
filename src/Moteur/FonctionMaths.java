@@ -9,7 +9,7 @@ public class FonctionMaths {
 	
 	
 	public double gain(int n, int p, int N, int P) {
-		return log2( (double) (n/(n+p)) ) - log2( (double) (N/(N+P)) );
+		return log2( ((double)n/((double)n+(double)p)) ) - log2(((double)N/((double)N+(double)P)) );
 	}
 	
 	

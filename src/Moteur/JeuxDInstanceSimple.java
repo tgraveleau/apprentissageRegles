@@ -49,6 +49,7 @@ public class JeuxDInstanceSimple {
 				System.out.println(attr.value(i));
 				System.out.println("\tTRUE: "+ this.counters_true.get( i_attr )[i] );
 				System.out.println("\tFALSE: "+ this.counters_false.get( i_attr )[i] );
+				System.out.println("\tGAIN : "+ this.fonctionMaths.gain(this.counters_false.get( i_attr )[i],this.counters_true.get( i_attr )[i],this.nb_false, this.nb_true ));
 			}
 		}
 		
