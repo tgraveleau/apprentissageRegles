@@ -13,8 +13,12 @@ public class FonctionMaths {
 	
 	
 	private double gain(int n, int p, int N, int P) {
-//		return log2( ((double)n/((double)n+(double)p)) ) - log2(((double)N/((double)N+(double)P)) );
-		return (double) p*(Math.log(p/(p+n))-Math.log(P/(P+N)));
+		return log2( ((double)n/((double)n+(double)p)) ) - log2(((double)N/((double)N+(double)P)) );
+		
+//		if ( p+n == 0 || P+N == 0)
+//			return -9999;
+//		else
+//			return (double) p*(Math.log(p/(p+n))-Math.log(P/(P+N)));
 	}
 	
 	
@@ -47,7 +51,7 @@ public class FonctionMaths {
 				nb_false++;
 			}
 		}
-		System.out.println("n:" +nb_false+", p: "+nb_true+", N:" +neg2.size()+", P: "+pos2.size());
+
 		return this.gain(nb_false, nb_true, neg2.size(), pos2.size());
 	}
 	

@@ -32,7 +32,7 @@ public class MainPanel extends JFrame {
 	public MainPanel() {
 		b_filechooser = new JButton("Select an arff file");
 		b_launch = new JButton("Lancer");
-		l_file = new JLabel("./docs/weather.nominal.arff");
+		l_file = new JLabel("./docs/vote.arff");
 		ta_regles = new JTextArea();
 		
 		init();

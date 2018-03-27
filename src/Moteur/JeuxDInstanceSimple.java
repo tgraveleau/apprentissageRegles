@@ -35,27 +35,25 @@ public class JeuxDInstanceSimple {
 		ArrayList<Instance> pos = this.instance_true;		
 		ArrayList<ConditionRegle> regles = new ArrayList<ConditionRegle>();
 		ArrayList<Literal> lits = (ArrayList<Literal>) this.getLiterals().clone();
-		int pred_size_pos = pos.size();
-		
+		int prev_size_pos = pos.size();
 		System.out.println("\n---- POSITIFS ----");
 		afficheInstances(pos);
-		System.out.println("\n---- NEGATIFS ----");
-		afficheInstances(neg);
+		
 		while ( ! pos.isEmpty() ) {
 			
 			ConditionRegle condition_regle = new ConditionRegle();
 			ArrayList<Instance> neg2 = (ArrayList<Instance>) neg.clone();
 			ArrayList<Instance> pos2 = (ArrayList<Instance>) pos.clone();
 			System.out.println("\n###\nTurn pos\n###");
-			int pred_size_neg2 = neg2.size();
+			int prev_size_neg2 = neg2.size();
 			
 			while ( ! neg2.isEmpty() ) {
 				Literal lit = literalWithMaxGain( lits, pos2, neg2 );
 				System.out.println("\n--- Turn neg2 "+ lit +" --- ");
 				System.out.println("\n---- NEGATIFS ----");
-				afficheInstances(neg);
+				afficheInstances(neg2);
 				System.out.println("\n---- POSITIFS ----");
-				afficheInstances(pos);
+				afficheInstances(pos2);
 				
 				// Remove literal with the same attribute
 				ArrayList<Literal> litToRemove = new ArrayList<Literal>();
@@ -84,11 +82,11 @@ public class JeuxDInstanceSimple {
 
 				System.out.println("neg2: "+neg2);
 				System.out.println("pos2: "+pos2);
-				if ( pred_size_neg2 == neg2.size() ) {
+				if ( prev_size_neg2 == neg2.size() ) {
 					System.out.println("pas de modif");
 					break;
 				} else {
-					pred_size_neg2 = neg2.size();
+					prev_size_neg2 = neg2.size();
 					condition_regle.getLitteraux().add(lit);
 				}
 				
@@ -100,7 +98,8 @@ public class JeuxDInstanceSimple {
 			
 			regles.add(condition_regle);
 			
-			System.out.println("\nPOS:\n\t"+pos);
+			System.out.println("\nPOS:");
+//			afficheInstances(pos);
 			ArrayList<Instance> toRemove = new ArrayList<Instance>();
 			for ( Instance inst : pos ) {
 				System.out.println(inst);
@@ -111,12 +110,11 @@ public class JeuxDInstanceSimple {
 			}
 			pos.removeAll(toRemove);
 
-			System.out.println("POS:\n\t"+pos);
-			if ( pred_size_pos == pos.size() ) {
+			if ( prev_size_pos == pos.size() ) {
 				System.out.println("pas de modif sur pos");
 				break;
 			}
-			pred_size_pos = pos.size();
+			prev_size_pos = pos.size();
 
 		}
 		
@@ -168,16 +166,25 @@ public class JeuxDInstanceSimple {
 				Literal literal = new Literal( attr.getAttr(), attr.getAttr().value(i) );
 				attr.getLiterraux().add( i, literal );
 			}
+			// We add the "?" value
+			attr.getLiterraux().add( nbValues, new Literal( attr.getAttr(), "?" ) );
 			
 			// For each instance
 			for ( int i_inst=0; i_inst<numInstance; i_inst++ ) {
 				Instance currentInst = this.instances.get(i_inst);
-				
+				System.out.println(currentInst);
 				// We get the index of the value of the attribute of the current instance
 				int index_valueOfAttr = -1;
-				for (int i_voa=0; i_voa<nbValues; i_voa++) {
-					if ( attr.getAttr().value( i_voa ) == currentInst.stringValue( attr.getAttr() ) ) {
-						index_valueOfAttr = i_voa;
+				System.out.println(attr.getAttr());
+				if ( currentInst.stringValue( attr.getAttr() ).equals("?") ) {
+					index_valueOfAttr = attr.getAttr().numValues();
+				} else {
+					for (int i_voa=0; i_voa<nbValues; i_voa++) {
+						System.out.println("\t"+attr.getAttr().value( i_voa )+" VS "+currentInst.stringValue( attr.getAttr()));
+						if ( attr.getAttr().value( i_voa ) == currentInst.stringValue( attr.getAttr() ) ) {
+							System.out.println("ok");
+							index_valueOfAttr = i_voa;
+						}
 					}
 				}
 				
