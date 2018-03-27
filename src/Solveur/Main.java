@@ -22,12 +22,12 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 				 
 		new MainPanel();
-		ParseurArff ra = new ParseurArff();
-		Instances data = ra.parse("./docs/weather.nominal.arff");
-		JeuxDInstanceSimple vals = new JeuxDInstanceSimple();
-		
-		vals.setValues( data );
-		vals.apprendre();
+//		ParseurArff ra = new ParseurArff();
+//		Instances data = ra.parse("./docs/weather.nominal.arff");
+//		JeuxDInstanceSimple vals = new JeuxDInstanceSimple();
+//		
+//		vals.setValues( data );
+//		vals.apprendre();
 		
 
 	}

@@ -32,7 +32,7 @@ public class MainPanel extends JFrame {
 	public MainPanel() {
 		b_filechooser = new JButton("Select an arff file");
 		b_launch = new JButton("Lancer");
-		l_file = new JLabel("./docs/vote.arff");
+		l_file = new JLabel("./weather.nominal.arff");
 		ta_regles = new JTextArea();
 		
 		init();
@@ -72,7 +72,7 @@ public class MainPanel extends JFrame {
 				int nb_regles = regles.size();
 				String txt_regles = "";
 				for ( int i=0; i<nb_regles; i++ ) {
-					txt_regles += "Regle n°"+i+":\n\t"+regles.get(i)+"\n";
+					txt_regles += "Regle n°"+(i+1)+":\n\t"+regles.get(i)+"\n";
 				}
 				
 				ta_regles.setText( txt_regles );
