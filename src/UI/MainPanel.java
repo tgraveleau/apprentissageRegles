@@ -4,29 +4,36 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Controller.MainController;
+import weka.core.Instances;
+import Moteur.ConditionRegle;
+import Moteur.JeuxDInstanceSimple;
+import Solveur.ParseurArff;
+
 
 public class MainPanel extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private JButton b_filechooser;
+	private JButton b_launch;
 	private JLabel l_file;
+	private JTextArea ta_regles;
 	
-	private MainController controller;
-
 	public MainPanel() {
 		b_filechooser = new JButton("Select an arff file");
-		l_file = new JLabel("No file selected");
-		controller = MainController.getInstance();
+		b_launch = new JButton("Lancer");
+		l_file = new JLabel("./docs/weather.nominal.arff");
+		ta_regles = new JTextArea();
 		
 		init();
 	}
@@ -34,7 +41,7 @@ public class MainPanel extends JFrame {
 	private void init() {
 		// Initialisation de la fenêtre
 		setLayout( new BoxLayout( getContentPane(), BoxLayout.Y_AXIS ) );
-		setTitle("Système Expert");
+		setTitle("Apprentissage règles");
 	    setSize(600, 400);
 	    setLocationRelativeTo(null);  
 
@@ -47,15 +54,37 @@ public class MainPanel extends JFrame {
 			    int returnVal = filechooser.showOpenDialog(null);
 			    if(returnVal == JFileChooser.APPROVE_OPTION) {
 			    	String absolutePath = filechooser.getSelectedFile().getAbsolutePath();
-			       l_file.setText( absolutePath );
-			       controller.fileSelected( absolutePath );
+			    	l_file.setText( absolutePath );
 			    }
+			}
+		});
+
+		b_launch.addActionListener( new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				ParseurArff ra = new ParseurArff();
+				Instances data = ra.parse( l_file.getText() );
+				JeuxDInstanceSimple vals = new JeuxDInstanceSimple();
+				
+				vals.setValues( data );
+
+				ArrayList<ConditionRegle> regles = vals.apprendre();
+				int nb_regles = regles.size();
+				String txt_regles = "";
+				for ( int i=0; i<nb_regles; i++ ) {
+					txt_regles += "Regle n°"+i+":\n\t"+regles.get(i)+"\n";
+				}
+				
+				ta_regles.setText( txt_regles );
+								
 			}
 		});
 		
 	    // Mise en place des composants
 		add(b_filechooser);
 		add(l_file);
+		add(b_launch);
+		add(ta_regles);
 		
 	    // Show Panel
 	    setVisible(true);

@@ -11,6 +11,7 @@ import weka.core.Instances;
 import weka.core.converters.ArffLoader.ArffReader;
 
 import Moteur.JeuxDInstanceSimple;
+import UI.MainPanel;
 
 public class Main {
 
@@ -20,12 +21,13 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 				 
+//		new MainPanel();
 		ParseurArff ra = new ParseurArff();
 		Instances data = ra.parse("./docs/weather.nominal.arff");
 		JeuxDInstanceSimple vals = new JeuxDInstanceSimple();
 		
 		vals.setValues( data );
-		vals.treatData();
+		vals.apprendre();
 		
 
 	}

@@ -34,7 +34,6 @@ public class ParseurArff {
 			Instance inst;
 
 			while ((inst = arff.readInstance(data)) != null) {
-				System.out.println(inst);
 				data.add(inst);
 			}
 		} catch (FileNotFoundException e) {

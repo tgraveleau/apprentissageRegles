@@ -1,5 +1,9 @@
 package Moteur;
 
+import java.util.ArrayList;
+
+import weka.core.Instance;
+
 public class FonctionMaths {
 
 	public static FonctionMaths instance;
@@ -8,8 +12,9 @@ public class FonctionMaths {
 	}
 	
 	
-	public double gain(int n, int p, int N, int P) {
-		return log2( ((double)n/((double)n+(double)p)) ) - log2(((double)N/((double)N+(double)P)) );
+	private double gain(int n, int p, int N, int P) {
+//		return log2( ((double)n/((double)n+(double)p)) ) - log2(((double)N/((double)N+(double)P)) );
+		return (double) p*(Math.log(p/(p+n))-Math.log(P/(P+N)));
 	}
 	
 	
@@ -24,6 +29,26 @@ public class FonctionMaths {
 			instance = new FonctionMaths();
 		}
 		return instance;
+	}
+
+
+	public double gain(Literal lit, ArrayList<Instance> pos2, ArrayList<Instance> neg2) {
+		
+		int nb_true =0, nb_false =0, index_attr =-1;
+		
+		for ( Instance inst : pos2 ) {
+			if ( lit.satisfy(inst) ) {
+				nb_true++;
+			}
+		}
+
+		for ( Instance inst : neg2 ) {
+			if ( lit.satisfy(inst) ) {
+				nb_false++;
+			}
+		}
+		System.out.println("n:" +nb_false+", p: "+nb_true+", N:" +neg2.size()+", P: "+pos2.size());
+		return this.gain(nb_false, nb_true, neg2.size(), pos2.size());
 	}
 	
 }

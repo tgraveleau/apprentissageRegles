@@ -12,47 +12,120 @@ public class JeuxDInstanceSimple {
 	private static final long serialVersionUID = 1L;
 
 	private Instances instances;
-	private ArrayList<Attribute> attributes;
+	private ArrayList<MyAttribute> attributes;
 	private FonctionMaths fonctionMaths;
 
-	// Counter of true and false value for each attributes
-	private ArrayList<int[]> counters_true;
-	private ArrayList<int[]> counters_false;
-	
 	private String trueValue;
 	private String falseValue;
 	private Attribute decisionField;
 
-	private int nb_false;
-	private int nb_true;
+	private ArrayList<Instance> instance_true;
+	private ArrayList<Instance> instance_false;
 	
 	public JeuxDInstanceSimple() {
 		this.fonctionMaths = FonctionMaths.getInstance();
-		this.attributes = new ArrayList<Attribute>();
-		this.counters_false = new ArrayList<int[]>();
-		this.counters_true = new ArrayList<int[]>();
-		this.nb_true = 0;
-		this.nb_false = 0;
+		this.attributes = new ArrayList<MyAttribute>();
+		this.instance_false = new ArrayList<Instance>();
+		this.instance_true = new ArrayList<Instance>();
 	}
 
-	public void treatData() {
-		// TODO Auto-generated method stub
-		System.out.println(this.instances);
-		System.out.println("\nTRUE: "+this.nb_true+", FALSE: "+this.nb_false+"\n");
+	public ArrayList<ConditionRegle> apprendre() {
+
+		ArrayList<Instance> neg = this.instance_false;
+		ArrayList<Instance> pos = this.instance_true;		
+		ArrayList<ConditionRegle> regles = new ArrayList<ConditionRegle>();
+		ArrayList<Literal> lits = (ArrayList<Literal>) this.getLiterals().clone();
+		int pred_size_pos = pos.size();
 		
-		int nbAttr = this.attributes.size();
-		for ( int i_attr = 0; i_attr<nbAttr; i_attr++ ) {
-			Attribute attr = this.attributes.get(i_attr);
-			System.out.println("###\n"+attr+"\n###\n");
-			int numVal = attr.numValues();
-			for ( int i=0; i<numVal; i++) {
-				System.out.println(attr.value(i));
-				System.out.println("\tTRUE: "+ this.counters_true.get( i_attr )[i] );
-				System.out.println("\tFALSE: "+ this.counters_false.get( i_attr )[i] );
-				System.out.println("\tGAIN : "+ this.fonctionMaths.gain(this.counters_false.get( i_attr )[i],this.counters_true.get( i_attr )[i],this.nb_false, this.nb_true ));
+		System.out.println("\n---- POSITIFS ----");
+		afficheInstances(pos);
+		System.out.println("\n---- NEGATIFS ----");
+		afficheInstances(neg);
+		while ( ! pos.isEmpty() ) {
+			
+			ConditionRegle condition_regle = new ConditionRegle();
+			ArrayList<Instance> neg2 = (ArrayList<Instance>) neg.clone();
+			ArrayList<Instance> pos2 = (ArrayList<Instance>) pos.clone();
+			System.out.println("\n###\nTurn pos\n###");
+			int pred_size_neg2 = neg2.size();
+			
+			while ( ! neg2.isEmpty() ) {
+				Literal lit = literalWithMaxGain( lits, pos2, neg2 );
+				System.out.println("\n--- Turn neg2 "+ lit +" --- ");
+				System.out.println("\n---- NEGATIFS ----");
+				afficheInstances(neg);
+				System.out.println("\n---- POSITIFS ----");
+				afficheInstances(pos);
+				
+				// Remove literal with the same attribute
+				ArrayList<Literal> litToRemove = new ArrayList<Literal>();
+				for ( Literal l : lits ) {
+					if ( l.getAttribute().name().equals( lit.getAttribute().name()) ) {
+						litToRemove.add(l);
+					}
+				}
+				lits.removeAll(litToRemove);
+				
+				// Remove instances that don't satisfy lit
+				ArrayList<Instance> toRemove = new ArrayList<Instance>();
+				for ( Instance inst : neg2 ) {
+					if ( ! lit.satisfy(inst) ) {
+						toRemove.add(inst);
+					}
+				}
+				neg2.removeAll(toRemove);
+				toRemove.clear();
+				for ( Instance inst : pos2 ) {
+					if ( ! lit.satisfy(inst) ) {
+						toRemove.add(inst);
+					}
+				}
+				pos2.removeAll(toRemove);
+
+				System.out.println("neg2: "+neg2);
+				System.out.println("pos2: "+pos2);
+				if ( pred_size_neg2 == neg2.size() ) {
+					System.out.println("pas de modif");
+					break;
+				} else {
+					pred_size_neg2 = neg2.size();
+					condition_regle.getLitteraux().add(lit);
+				}
+				
 			}
+			condition_regle.setThenField( this.decisionField.name() );
+			condition_regle.setThenValue( this.trueValue );
+		
+			System.out.println("Regle: " + condition_regle);
+			
+			regles.add(condition_regle);
+			
+			System.out.println("\nPOS:\n\t"+pos);
+			ArrayList<Instance> toRemove = new ArrayList<Instance>();
+			for ( Instance inst : pos ) {
+				System.out.println(inst);
+				if ( condition_regle.satisfy(inst) ) {
+					System.out.println("remove");
+					toRemove.add(inst);
+				}
+			}
+			pos.removeAll(toRemove);
+
+			System.out.println("POS:\n\t"+pos);
+			if ( pred_size_pos == pos.size() ) {
+				System.out.println("pas de modif sur pos");
+				break;
+			}
+			pred_size_pos = pos.size();
+
 		}
 		
+		int nb_regles = regles.size();
+		for ( int i=0; i<nb_regles; i++ ) {
+			System.out.println("Regle n°"+i+":\n\t"+regles.get(i));
+		}
+		
+		return regles;		
 	}
 
 	public void setValues(Instances data) {
@@ -67,31 +140,33 @@ public class JeuxDInstanceSimple {
 				this.falseValue = data.attribute(i).value(1);
 			} else {
 				// We don't save the decision field in the attributes
-				this.attributes.add( data.attribute(i) );
+				MyAttribute attr = new MyAttribute();
+				attr.setAttr(data.attribute(i));
+				this.attributes.add( attr );
 			}
 		}
 		
-		// We count how many true and false values there is
+		// We see which instances are true, which are false
 		for ( Instance inst : this.instances ) {
 			if ( inst.stringValue(decisionField) == this.trueValue ) {
-				this.nb_true++;
+				this.instance_true.add(inst);
 			} else {
-				this.nb_false++;
+				this.instance_false.add(inst);
 			}
 		}
 		
-		int numInstance = this.instances.numInstances();
+		int
+			numInstance = this.instances.numInstances(),
+			numAttr = this.attributes.size();
+			;
 		// Foreach attributes we look how many true or false instance it has
-		for ( Attribute attr : this.attributes ) {
-//			System.out.println( attr );
+		for ( int i_attr = 0; i_attr<numAttr; i_attr++  ) {
+			MyAttribute attr = this.attributes.get(i_attr);
 			
-			int nbValues = attr.numValues();
-			// We declare tables with as many row as possible values for the attribute to count true and false instance
-			int[] counter_true = new int[ nbValues ];
-			int[] counter_false = new int[ nbValues ];
+			int nbValues = attr.getAttr().numValues();
 			for ( int i=0; i<nbValues; i++ ) {
-				counter_true[i] = 0;
-				counter_false[i] = 0;
+				Literal literal = new Literal( attr.getAttr(), attr.getAttr().value(i) );
+				attr.getLiterraux().add( i, literal );
 			}
 			
 			// For each instance
@@ -101,30 +176,66 @@ public class JeuxDInstanceSimple {
 				// We get the index of the value of the attribute of the current instance
 				int index_valueOfAttr = -1;
 				for (int i_voa=0; i_voa<nbValues; i_voa++) {
-					if ( attr.value( i_voa ) == currentInst.stringValue( attr ) ) {
+					if ( attr.getAttr().value( i_voa ) == currentInst.stringValue( attr.getAttr() ) ) {
 						index_valueOfAttr = i_voa;
 					}
 				}
-//				System.out.println("\t"+currentInst.stringValue( attr ) +", i: "+index_valueOfAttr);
 				
 				// If the current instance leads to a "true"
 				if ( currentInst.stringValue( this.decisionField ) == this.trueValue ) {
-					counter_true[ index_valueOfAttr ]++;
-//					System.out.println( "\t"+currentInst.stringValue( attr ) +", true: "+ counter_true[ index_valueOfAttr ]);
+					attr.incrementTrueLiteral( index_valueOfAttr );
 				} else {
-					counter_false[ index_valueOfAttr ]++;
-//					System.out.println( "\t"+currentInst.stringValue( attr ) +", false: "+ counter_false[ index_valueOfAttr ]);
+					attr.incrementFalseLiteral( index_valueOfAttr );
 				}
 				
 			}
 			
-			// At the end of the loop, we add the counters to the ArrayLists
-			this.counters_true.add(counter_true);
-			this.counters_false.add(counter_false);
 		}
 		
 	}
-	
-	
+
+	private ArrayList<Literal> getLiterals() {
+		ArrayList<Literal> lits = new ArrayList<Literal>();
+
+		for ( MyAttribute attr : this.attributes ) {
+			for ( Literal lit : attr.getLiterraux() ) {
+				lits.add(lit);
+			}
+		}
+		
+		return lits;
+	}
+
+
+	private Literal literalWithMaxGain(ArrayList<Literal> literals, ArrayList<Instance> pos2, ArrayList<Instance> neg2) {
+
+		if ( literals.isEmpty() ) {
+			return null;
+		}
+
+		Literal max = literals.get(0);
+		double maxGain = this.fonctionMaths.gain(max, pos2, neg2);
+		
+		// Foreach literal we compute the "gain"
+		int nb_lits = literals.size();
+		for ( int i=1; i<nb_lits; i++ ) {
+			Literal lit = literals.get(i);
+			double gainLit = this.fonctionMaths.gain(lit, pos2, neg2);
+			
+			if (  gainLit > maxGain ) {
+				max = lit;
+				maxGain = gainLit;
+			}
+			
+		}
+
+		return max;
+	}
+
+	private void afficheInstances( ArrayList<Instance> instances) {
+		for (Instance i : instances) {
+			System.out.println(i);
+		}
+	}
 	
 }
